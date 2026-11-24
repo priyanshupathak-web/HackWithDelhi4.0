@@ -9,7 +9,7 @@
 
 export const API_CONFIG = {
   // Your OpenRouter API Key
-  apiKey: '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',
+  apiKey: process.env.OPENROUTER_API_KEY,
   
   // OpenRouter API Endpoint
   apiUrl: 'https://openrouter.ai/api/v1/chat/completions',
