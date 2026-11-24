@@ -7,8 +7,13 @@ class KisanSathi {
     this.apiUrl = API_CONFIG.apiUrl;
     this.model = API_CONFIG.model;
 
-    // Session and Backend mode support
-    this.sessionUuid = sessionStorage.getItem('kisanSathiSessionUuid') || null;
+    // Validate API key is loaded
+    if (!this.apiKey || this.apiKey === 'your_api_key_here') {
+      console.error('❌ API Key not configured! Please update config.js with your actual API key.');
+      this.showErrorMessage('Configuration error: API key not found. Please check config.js');
+      return;
+    }
+
     console.log('✅ API Configuration loaded from config.js');
 
     // System prompt for agricultural context
@@ -128,35 +133,6 @@ Be encouraging and empathetic. Remember farmers face real challenges. Always sug
   }
 
   async callOpenRouter(userMessage) {
-    // Connect to Spring Boot Backend API if available
-    if (window.apiClient && typeof window.apiClient.chat?.sendMessage === 'function') {
-      try {
-        this.isLoading = true;
-        if (this.sendBtn) this.sendBtn.disabled = true;
-        this.addMessageToUI(userMessage, 'user');
-        if (this.suggestionsContainer) this.suggestionsContainer.style.display = 'none';
-        this.showTypingIndicator();
-
-        const chatRes = await window.apiClient.chat.sendMessage(this.sessionUuid || '', userMessage);
-        if (chatRes && chatRes.sessionUuid) {
-          this.sessionUuid = chatRes.sessionUuid;
-          sessionStorage.setItem('kisanSathiSessionUuid', this.sessionUuid);
-        }
-        const aiResponse = (chatRes && chatRes.content) || "I am Kisan Sathi. How can I assist you with your crops today?";
-        this.conversationHistory.push({ role: 'user', content: userMessage });
-        this.conversationHistory.push({ role: 'assistant', content: aiResponse });
-        this.removeTypingIndicator();
-        this.addMessageToUI(aiResponse, 'bot');
-        this.saveChatHistory();
-        return;
-      } catch (backendErr) {
-        console.warn('Backend chat API error, attempting direct API call fallback:', backendErr);
-      } finally {
-        this.isLoading = false;
-        if (this.sendBtn) this.sendBtn.disabled = false;
-        if (this.input) this.input.focus();
-      }
-    }
     try {
       this.isLoading = true;
       if (this.sendBtn) this.sendBtn.disabled = true;
